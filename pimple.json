@@ -1,0 +1,172 @@
+[
+    {
+        "name": "request.http_port",
+        "type": "int",
+        "value": 80
+    },
+    {
+        "name": "request.https_port",
+        "type": "int",
+        "value": 443
+    },
+    {
+        "name": "debug",
+        "type": "bool",
+        "value": true
+    },
+    {
+        "name": "charset",
+        "type": "string",
+        "value": "UTF-8"
+    },
+    {
+        "name": "logger",
+        "type": "null",
+        "value": ""
+    },
+    {
+        "name": "resolver",
+        "type": "class",
+        "value": "Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver"
+    },
+    {
+        "name": "argument_metadata_factory",
+        "type": "class",
+        "value": "Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadataFactory"
+    },
+    {
+        "name": "argument_value_resolvers",
+        "type": "array",
+        "value": ""
+    },
+    {
+        "name": "argument_resolver",
+        "type": "class",
+        "value": "Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver"
+    },
+    {
+        "name": "kernel",
+        "type": "class",
+        "value": "Symfony\\Component\\HttpKernel\\HttpKernel"
+    },
+    {
+        "name": "request_stack",
+        "type": "class",
+        "value": "Symfony\\Component\\HttpFoundation\\RequestStack"
+    },
+    {
+        "name": "dispatcher",
+        "type": "class",
+        "value": "Symfony\\Component\\EventDispatcher\\EventDispatcher"
+    },
+    {
+        "name": "callback_resolver",
+        "type": "class",
+        "value": "Silex\\CallbackResolver"
+    },
+    {
+        "name": "route_class",
+        "type": "string",
+        "value": "Silex\\Route"
+    },
+    {
+        "name": "route_factory",
+        "type": "class",
+        "value": "Silex\\Route"
+    },
+    {
+        "name": "routes_factory",
+        "type": "class",
+        "value": "Symfony\\Component\\Routing\\RouteCollection"
+    },
+    {
+        "name": "routes",
+        "type": "class",
+        "value": "Symfony\\Component\\Routing\\RouteCollection"
+    },
+    {
+        "name": "url_generator",
+        "type": "class",
+        "value": "Symfony\\Component\\Routing\\Generator\\UrlGenerator"
+    },
+    {
+        "name": "request_matcher",
+        "type": "class",
+        "value": "Silex\\Provider\\Routing\\RedirectableUrlMatcher"
+    },
+    {
+        "name": "request_context",
+        "type": "class",
+        "value": "Symfony\\Component\\Routing\\RequestContext"
+    },
+    {
+        "name": "controllers",
+        "type": "class",
+        "value": "Silex\\ControllerCollection"
+    },
+    {
+        "name": "controllers_factory",
+        "type": "class",
+        "value": "Silex\\ControllerCollection"
+    },
+    {
+        "name": "routing.listener",
+        "type": "class",
+        "value": "Symfony\\Component\\HttpKernel\\EventListener\\RouterListener"
+    },
+    {
+        "name": "exception_handler",
+        "type": "class",
+        "value": "Silex\\ExceptionHandler"
+    },
+    {
+        "name": "serializer",
+        "type": "class",
+        "value": "Symfony\\Component\\Serializer\\Serializer"
+    },
+    {
+        "name": "serializer.encoders",
+        "type": "array",
+        "value": ""
+    },
+    {
+        "name": "serializer.normalizers",
+        "type": "array",
+        "value": ""
+    },
+    {
+        "name": "db_connection",
+        "type": "class",
+        "value": "Doctrine\\DBAL\\Connection"
+    },
+    {
+        "name": "event_bus",
+        "type": "class",
+        "value": "Prooph\\ServiceBus\\EventBus"
+    },
+    {
+        "name": "event_store",
+        "type": "class",
+        "value": "Prooph\\EventStore\\EventStore"
+    },
+    {
+        "name": "repo_account",
+        "type": "class",
+        "value": "Infrastructure\\EventSourcedAccountRepository"
+    },
+    {
+        "name": "transaction_manager",
+        "type": "class",
+        "value": "Prooph\\EventStoreBusBridge\\TransactionManager"
+    },
+    {
+        "name": "command_bus",
+        "type": "class",
+        "value": "Prooph\\ServiceBus\\CommandBus"
+    },
+    {
+        "name": "event_router",
+        "type": "class",
+        "value": "Prooph\\ServiceBus\\Plugin\\Router\\EventRouter"
+    }
+]

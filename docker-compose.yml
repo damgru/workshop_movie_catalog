@@ -1,0 +1,35 @@
+web:
+  build: .
+  ports:
+    - 6001:80
+  volumes:
+    - .:/var/www/html
+  environment:
+    - DB_DRIVER=mysql
+    - DB_HOST=mysql
+    - DB_USER=user
+    - DB_PASSWORD=userpass
+    - DB_NAME=workshop
+    - DB_PORT=3306
+mysql:
+  image: mysql
+  environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=workshop
+    - MYSQL_USER=user
+    - MYSQL_PASSWORD=userpass
+  ports:
+    - 3306:3306
+rabbit1:
+  image: "rabbitmq:3-management"
+  hostname: "rabbit1"
+  environment:
+    RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+    RABBITMQ_DEFAULT_USER: "rabbitmq"
+    RABBITMQ_DEFAULT_PASS: "rabbitmq"
+    RABBITMQ_DEFAULT_VHOST: "/"
+  ports:
+    - "15672:15672"
+    - "5672:5672"
+  labels:
+    NAME: "rabbitmq1"
