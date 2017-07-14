@@ -150,9 +150,9 @@
         "value": "Prooph\\EventStore\\EventStore"
     },
     {
-        "name": "repo_account",
+        "name": "repo_movies",
         "type": "class",
-        "value": "Infrastructure\\EventSourcedAccountRepository"
+        "value": "Infrastructure\\EventSourcedMoviesRepository"
     },
     {
         "name": "transaction_manager",

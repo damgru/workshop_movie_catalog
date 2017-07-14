@@ -2,11 +2,11 @@
 define('DEBUG_MODE', true);
 
 //define('DB_HOST', '172.17.0.1');
-define('DB_HOST', 'localhost');
+define('DB_HOST', '52.16.150.144');
 define('DB_PORT', 3306);
-define('DB_USER', 'root');
-define('DB_PASS', 'root');
-define('DB_NAME', 'workshop');
+define('DB_USER', 'workshop');
+define('DB_PASS', 'workshop');
+define('DB_NAME', 'movie_catalog');
 
 //http://192.168.96.125:32781/
 //define('RABBITMQ_HOST', '192.168.96.125');

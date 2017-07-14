@@ -11,19 +11,25 @@ namespace Infrastructure;
 
 use Domain\Movie;
 use Domain\MoviesRepository;
+use Prooph\EventStore\Aggregate\AggregateRepository;
 use Rhumsaa\Uuid\Uuid;
 
 class EventSourcedMoviesRepository implements MoviesRepository
 {
+    private $ar;
 
-    public function GetMovies()
+    /**
+     * EventSourcedMoviesRepository constructor.
+     * @param $ar
+     */
+    public function __construct(AggregateRepository $ar)
     {
-        // TODO: Implement GetMovies() method.
+        $this->ar = $ar;
     }
 
-    public function GetMovie(Uuid $uuid)
+    public function GetMovie(Uuid $uuid) : Movie
     {
-        // TODO: Implement GetMovie() method.
+        return $this->ar->getAggregateRoot($uuid->toString());
     }
 
     public function AddMovie(Movie $movie)

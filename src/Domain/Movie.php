@@ -9,6 +9,9 @@
 namespace Domain;
 
 
+use Domain\Event\MovieAdded;
+use Domain\Event\MovieDeleted;
+use Domain\Event\MovieWatched;
 use Prooph\EventSourcing\AggregateRoot;
 use Rhumsaa\Uuid\Uuid;
 
@@ -20,6 +23,8 @@ class Movie extends AggregateRoot implements \JsonSerializable
     private $name;
     /** @var  string */
     private $img;
+    /** @var  string */
+    private $url;
 
     /**
      * @param $uuid
@@ -27,13 +32,27 @@ class Movie extends AggregateRoot implements \JsonSerializable
      * @param $img
      * @return Movie
      */
-    public static function new($uuid, $name, $img)
+    public static function new($uuid, $name, $img, $url)
     {
         $self = new self();
         $self->uuid = $uuid;
         $self->name = $name;
         $self->img = $img;
+        $self->url = $url;
         return $self;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    public function watchMovie()
+    {
+        $this->recordThat(MovieWatched::from($this->getUuid(), $this->getName()));
     }
 
 
@@ -76,5 +95,23 @@ class Movie extends AggregateRoot implements \JsonSerializable
     protected function aggregateId()
     {
         return $this->getUuid()->toString();
+    }
+
+    public function whenMovieAdded(MovieAdded $e)
+    {
+        $this->uuid = $e->getUuid();
+        $this->name = $e->getName();
+        $this->url = $e->getUrl();
+        $this->img = $e->getImg();
+    }
+
+    public function whenMovieDeleted(MovieDeleted $e)
+    {
+
+    }
+
+    public function whenMovieWatched(MovieWatched $e)
+    {
+
     }
 }

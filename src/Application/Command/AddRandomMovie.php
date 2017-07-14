@@ -10,13 +10,14 @@ namespace Application\Command;
 
 
 use Application\SimpleCommand;
+use Badcow\LoremIpsum\Generator;
 use Rhumsaa\Uuid\Uuid;
 
 /**
  * Class AddMovie
  * @package Application\Command
  */
-class AddMovie extends SimpleCommand
+class AddRandomMovie extends SimpleCommand
 {
     /**
      * @var Uuid
@@ -35,19 +36,13 @@ class AddMovie extends SimpleCommand
      */
     private $url;
 
-    /**
-     * AddMovie constructor.
-     * @param Uuid $uuid
-     * @param string $name
-     * @param string $img
-     * @param string $url
-     */
-    public function __construct(Uuid $uuid, string $name, string $img, string $url)
+    public function __construct()
     {
-        $this->uuid = $uuid;
-        $this->name = $name;
-        $this->img = $img;
-        $this->url = $url;
+        parent::__construct();
+        $this->uuid = Uuid::uuid4();
+        $this->name = 'sadf';
+        $this->img = 'http://lorempixel.com/400/200/';
+        $this->url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
     }
 
     /**

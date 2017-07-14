@@ -14,7 +14,8 @@
         "php-amqplib/php-amqplib": "^2.6",
         "silex/silex": "^2.1",
         "symfony/serializer": "^3.3",
-        "sorien/silex-pimple-dumper": "~2.0"
+        "sorien/silex-pimple-dumper": "~2.0",
+        "badcow/lorem-ipsum": "^1.1"
     },
     "autoload": {
         "psr-4": { "": "src/" }

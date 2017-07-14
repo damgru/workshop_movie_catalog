@@ -32,7 +32,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once __DIR__ . '/../config.php';
 
 $app = new Application();
@@ -84,15 +84,15 @@ $app['event_store'] = function (Application $app) {
 
     return $eventStore;
 };
-$app['repo_account'] = function (Application $app) {
-    $accountRepository = new EventSourcedAccountRepository(
+$app['repo_movies'] = function (Application $app) {
+    $moviesRepository = new \Infrastructure\EventSourcedMoviesRepository(
         new AggregateRepository(
             $app['event_store'],
-            AggregateType::fromAggregateRootClass(Account::class),
+            AggregateType::fromAggregateRootClass(\Domain\Movie::class),
             new AggregateTranslator()
         )
     );
-    return $accountRepository;
+    return $moviesRepository;
 };
 $app['transaction_manager'] = function (Application $app) {
     $transactionManager = new TransactionManager();
@@ -107,78 +107,92 @@ $app['command_bus'] = function (Application $app) {
 $app['event_router'] = function (Application $app) {
     $eventRouter = new EventRouter();
     $eventRouter
-        ->route(AccountCreated::class)
-        ->to(function (AccountCreated $event) {
+        ->route(\Domain\Event\MovieAdded::class)
+        ->to(function (\Domain\Event\MovieAdded $event) {
             //var_dump('CREATED: ' . $event->currency());
-        });
-    $eventRouter
-        ->route(MoneyAdded::class)
-        ->to(function (MoneyAdded $event) {
-            //var_dump('LOADED: ' . $event->amount());
-        });
-    $eventRouter
-        ->route(AccountChangedName::class)
-        ->to(function (AccountChangedName $event) {
-            //var_dump('CHANGED NAME: ' . $event->getName());
         });
 
     $eventRouter->attach($app['event_bus']->getActionEventEmitter());
     return $eventRouter;
 };
 
-//Routing
+###############################################3
+## COMMANDS
+
 $commandRouter = new CommandRouter();
 $commandRouter->attach($app['command_bus']->getActionEventEmitter());
 $commandRouter
-    ->route(CreateAccount::class)
-    ->to(new \Application\Handler\CreateAccountHandler($app['repo_account']));
+    ->route(\Application\Command\AddMovie::class)
+    ->to(function(\Application\Command\AddMovie $command) use ($app){
+        $app['repo_movies']->AddMovie(\Domain\Movie::new(
+            $command->getUuid(), $command->getName(), $command->getImg(), $command->getUrl()
+        ));
+    });
 $commandRouter
-    ->route(AddMoney::class)
-    ->to(new AddMoneyHandler($app['repo_account']));
-$commandRouter
-    ->route(AccountChangeName::class)
-    ->to(new AccountChangeNameHandler($app['repo_account']));
-
-$app['event_router']
-    ->route(AccountCreated::class)
-    ->to(function (AccountCreated $event) {
-        //var_dump('CREATED: ' . $event->currency());
-    });
-$app['event_router']
-    ->route(MoneyAdded::class)
-    ->to(function (MoneyAdded $event) {
-        //var_dump('LOADED: ' . $event->amount());
-    });
-$app['event_router']
-    ->route(AccountChangedName::class)
-    ->to(function (AccountChangedName $event) {
-        //var_dump('CHANGED NAME: ' . $event->getName());
+    ->route(\Application\Command\DeleteMovie::class)
+    ->to(function(\Application\Command\DeleteMovie $command) use ($app){
+        $app['repo_movies']->DeleteMovieByUuid($command->getUuid());
     });
 
-$app->post('/accounts', function (Application $app, Request $request){
+###########################################
+## EVENTY
 
-    $uuid = Uuid::uuid4();
-    $currency = $request->get('currency');
-    $app['command_bus']->dispatch(new CreateAccount($uuid, $currency));
-    return new Response('', Response::HTTP_CREATED, ['location' => $app['url_generator']->generate('getAccountByUuid', ['uuid' => $uuid->toString()])]);
+$app['event_router']
+    ->route(\Domain\Event\MovieAdded::class)
+    ->to(function (\Domain\Event\MovieAdded $event) {
+
+    });
+$app['event_router']
+    ->route(\Domain\Event\MovieDeleted::class)
+    ->to(function (\Domain\Event\MovieDeleted $event) {
+
+    });
+$app['event_router']
+    ->route(\Domain\Event\MovieWatched::class)
+    ->to(function (\Domain\Event\MovieWatched $event) {
+
+    });
+
+##################################
+## ROUTING
+
+$app->match('/', function (Application $app){
+    return new Response('Hello');
 });
 
-$app->get('/accounts/{uuid}', function (Application $app, Request $request, $uuid) {
+$app->post('/movies', function (Application $app, Request $request){
+    $uuid = Uuid::uuid4();
+    $name = $request->get('name');
+    $img = $request->get('img');
+    $url = $request->get('url');
+    $app['command_bus']->dispatch(new \Application\Command\AddMovie($uuid, $name, $img, $url));
+    return new Response('', Response::HTTP_CREATED, ['location' => $app['url_generator']->generate('GetMovieByUuid', ['uuid' => $uuid->toString()])]);
+});
+
+$app->get('/movies/{uuid}', function (Application $app, Request $request, $uuid) {
     if(!Uuid::isValid($uuid)) {
         return new Response( 'Invalid uuid', Response::HTTP_BAD_REQUEST);
     }
     $uuid = Uuid::fromString($uuid);
     $format = $request->getRequestFormat('json');
 
-    /** @var Account $account */
-    $repoAccount = $app['repo_account'];
-    $account = $repoAccount->get($uuid);
-    if(!$account instanceof Account) {
+    /** @var \Domain\Movie $movie */
+    $repo = $app['repo_movies'];
+    $movie = $repo->get($uuid);
+    if(!$movie instanceof \Domain\Movie) {
         return new Response( 'There is no account with this uuid', Response::HTTP_NO_CONTENT);
     }
 
-    $result = $app['serializer']->serialize($account, $format);
+    $result = $app['serializer']->serialize($movie, $format);
     return new Response($result);
-})->bind('getAccountByUuid');
+})->bind('getMovieByUuid');
+
+$app->get('/movies/', function (Application $app){
+    /** @var \Domain\MoviesRepository $repo */
+    $view = new \Infrastructure\ReadonlyMovies($app['db_connection']);
+    $movies = $view->getMovies();
+    return new Response(json_encode($movies));
+});
+
 
 $app->run();
