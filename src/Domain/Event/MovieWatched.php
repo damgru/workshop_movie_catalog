@@ -13,6 +13,8 @@ use Domain\MovieEvent;
 
 class MovieWatched extends MovieEvent
 {
+    const NAME = 'MOVIE_WATCHED';
+
     public static function from($uuid, $name)
     {
         return MovieEvent::new([

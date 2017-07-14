@@ -2,8 +2,6 @@
 use Application\Command\AccountChangeName;
 use Application\Command\AddMoney;
 use Application\Command\CreateAccount;
-use Application\Handler\AccountChangeNameHandler;
-use Application\Handler\AddMoneyHandler;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Schema\SchemaException;
 use Domain\Account;
@@ -21,6 +19,7 @@ use Prooph\EventStore\Adapter\PayloadSerializer\JsonPayloadSerializer;
 use Prooph\EventStore\Aggregate\AggregateRepository;
 use Prooph\EventStore\Aggregate\AggregateType;
 use Prooph\EventStore\EventStore;
+use Prooph\EventStore\Stream\StreamName;
 use Prooph\EventStoreBusBridge\EventPublisher;
 use Prooph\EventStoreBusBridge\TransactionManager;
 use Prooph\ServiceBus\CommandBus;
@@ -38,6 +37,10 @@ require_once __DIR__ . '/../config.php';
 $app = new Application();
 $app->register(new \Silex\Provider\SerializerServiceProvider());
 $app->register(new Sorien\Provider\PimpleDumpProvider());
+
+$app->after(function (Request $request, Response $response) {
+    $response->headers->set('Access-Control-Allow-Origin', '*');
+});
 
 $app['debug'] = DEBUG_MODE;
 $app['db_connection'] = function () {
@@ -124,7 +127,7 @@ $commandRouter->attach($app['command_bus']->getActionEventEmitter());
 $commandRouter
     ->route(\Application\Command\AddMovie::class)
     ->to(function(\Application\Command\AddMovie $command) use ($app){
-        $app['repo_movies']->AddMovie(\Domain\Movie::new(
+        $app['repo_movies']->saveMovie(\Domain\Movie::new(
             $command->getUuid(), $command->getName(), $command->getImg(), $command->getUrl()
         ));
     });
@@ -139,18 +142,31 @@ $commandRouter
 
 $app['event_router']
     ->route(\Domain\Event\MovieAdded::class)
-    ->to(function (\Domain\Event\MovieAdded $event) {
+    ->to(function (\Domain\Event\MovieAdded $event) use ($app) {
+        $readmovies = new \Infrastructure\ReadonlyMovies($app['db_connection']);
+        $readmovies->whenMovieAdded($event);
+
+        \Application\RabbitSender::sendMessage(\Application\RabbitMesseagerHelper::createMessage(
+            \Domain\Event\MovieAdded::class,
+            $event->uuid()->toString(),
+            [
+                'name' => $event->getName(),
+                'uuid' => $event->getUuid()
+            ]
+        ));
 
     });
 $app['event_router']
     ->route(\Domain\Event\MovieDeleted::class)
-    ->to(function (\Domain\Event\MovieDeleted $event) {
-
+    ->to(function (\Domain\Event\MovieDeleted $event) use ($app) {
+        $readmovies = new \Infrastructure\ReadonlyMovies($app['db_connection']);
+        $readmovies->whenMovieDeleted($event);
+        \Application\RabbitSender::sendMessage(json_encode($event->payload()));
     });
 $app['event_router']
     ->route(\Domain\Event\MovieWatched::class)
     ->to(function (\Domain\Event\MovieWatched $event) {
-
+        \Application\RabbitSender::sendMessage(json_encode($event->payload()));
     });
 
 ##################################
@@ -158,15 +174,6 @@ $app['event_router']
 
 $app->match('/', function (Application $app){
     return new Response('Hello');
-});
-
-$app->post('/movies', function (Application $app, Request $request){
-    $uuid = Uuid::uuid4();
-    $name = $request->get('name');
-    $img = $request->get('img');
-    $url = $request->get('url');
-    $app['command_bus']->dispatch(new \Application\Command\AddMovie($uuid, $name, $img, $url));
-    return new Response('', Response::HTTP_CREATED, ['location' => $app['url_generator']->generate('GetMovieByUuid', ['uuid' => $uuid->toString()])]);
 });
 
 $app->get('/movies/{uuid}', function (Application $app, Request $request, $uuid) {
@@ -178,21 +185,40 @@ $app->get('/movies/{uuid}', function (Application $app, Request $request, $uuid)
 
     /** @var \Domain\Movie $movie */
     $repo = $app['repo_movies'];
-    $movie = $repo->get($uuid);
+    $movie = $repo->getMovie($uuid);
     if(!$movie instanceof \Domain\Movie) {
         return new Response( 'There is no account with this uuid', Response::HTTP_NO_CONTENT);
     }
-
     $result = $app['serializer']->serialize($movie, $format);
     return new Response($result);
 })->bind('getMovieByUuid');
+
+$app->post('/movies', function (Application $app, Request $request){
+    $uuid = Uuid::uuid4();
+    $name = $request->get('name');
+    $url = $request->get('url');
+    $img = \Application\ThumbMicroservice::generateThumbUrlFromYoutubeUrl($url);
+    $app['command_bus']->dispatch(new \Application\Command\AddMovie($uuid, $name, $img, $url));
+    return new Response('', Response::HTTP_CREATED, ['location' => $app['url_generator']->generate('getMovieByUuid', ['uuid' => $uuid->toString()])]);
+});
 
 $app->get('/movies/', function (Application $app){
     /** @var \Domain\MoviesRepository $repo */
     $view = new \Infrastructure\ReadonlyMovies($app['db_connection']);
     $movies = $view->getMovies();
+    foreach ($movies as &$movie)
+    {
+        unset($movie['id']);
+        $movie['url'] = '';
+    }
     return new Response(json_encode($movies));
 });
 
+$app->get('/admin/replayevents/', function (Application $app){
+    $events = $app['event_store']->loadEventsByMetadataFrom(new StreamName('event_stream'), []);
+        foreach ($events as $event) {
+            $app['event_bus']->dispatch($event);
+        }
+});
 
 $app->run();

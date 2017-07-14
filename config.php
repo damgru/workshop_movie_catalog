@@ -11,8 +11,10 @@ define('DB_NAME', 'movie_catalog');
 //http://192.168.96.125:32781/
 //define('RABBITMQ_HOST', '192.168.96.125');
 //define('RABBITMQ_PORT', 32778);
-define('RABBITMQ_HOST', 'localhost');
+define('RABBITMQ_HOST', '52.16.150.144');
 define('RABBITMQ_PORT', 5672);
-define('RABBITMQ_USER', 'rabbitmq');
-define('RABBITMQ_PASS', 'rabbitmq');
+define('RABBITMQ_USER', 'guest');
+define('RABBITMQ_PASS', 'guest');
 define('RABBITMQ_VHOST', '/');
+
+define('THUMB_HOST', 'http://192.168.96.170:8080');

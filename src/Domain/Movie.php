@@ -24,7 +24,7 @@ class Movie extends AggregateRoot implements \JsonSerializable
     /** @var  string */
     private $img;
     /** @var  string */
-    private $url;
+    private $link;
 
     /**
      * @param $uuid
@@ -38,16 +38,17 @@ class Movie extends AggregateRoot implements \JsonSerializable
         $self->uuid = $uuid;
         $self->name = $name;
         $self->img = $img;
-        $self->url = $url;
+        $self->link = $url;
+        $self->recordThat(MovieAdded::from($uuid, $name, $url, $img));
         return $self;
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string
+    public function getLink(): string
     {
-        return $this->url;
+        return $this->link;
     }
 
     public function watchMovie()
@@ -94,14 +95,14 @@ class Movie extends AggregateRoot implements \JsonSerializable
      */
     protected function aggregateId()
     {
-        return $this->getUuid()->toString();
+        return $this->getUuid();
     }
 
     public function whenMovieAdded(MovieAdded $e)
     {
         $this->uuid = $e->getUuid();
         $this->name = $e->getName();
-        $this->url = $e->getUrl();
+        $this->link = $e->getUrl();
         $this->img = $e->getImg();
     }
 

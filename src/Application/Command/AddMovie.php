@@ -21,19 +21,19 @@ class AddMovie extends SimpleCommand
     /**
      * @var Uuid
      */
-    private $uuid;
+    protected $uuid;
     /**
      * @var string
      */
-    private $name;
+    protected $name;
     /**
      * @var string
      */
-    private $img;
+    protected $img;
     /**
      * @var string
      */
-    private $url;
+    protected $url;
 
     /**
      * AddMovie constructor.
@@ -44,6 +44,7 @@ class AddMovie extends SimpleCommand
      */
     public function __construct(Uuid $uuid, string $name, string $img, string $url)
     {
+        parent::__construct();
         $this->uuid = $uuid;
         $this->name = $name;
         $this->img = $img;

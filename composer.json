@@ -15,7 +15,8 @@
         "silex/silex": "^2.1",
         "symfony/serializer": "^3.3",
         "sorien/silex-pimple-dumper": "~2.0",
-        "badcow/lorem-ipsum": "^1.1"
+        "badcow/lorem-ipsum": "^1.1",
+        "jdesrosiers/silex-cors-provider": "^1.4"
     },
     "autoload": {
         "psr-4": { "": "src/" }

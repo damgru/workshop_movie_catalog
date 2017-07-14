@@ -27,18 +27,13 @@ class EventSourcedMoviesRepository implements MoviesRepository
         $this->ar = $ar;
     }
 
-    public function GetMovie(Uuid $uuid) : Movie
+    public function getMovie(Uuid $uuid) : Movie
     {
         return $this->ar->getAggregateRoot($uuid->toString());
     }
 
-    public function AddMovie(Movie $movie)
+    public function saveMovie(Movie $movie)
     {
-        // TODO: Implement AddMovie() method.
-    }
-
-    public function DeleteMovieByUuid(Uuid $uuid)
-    {
-        // TODO: Implement DeleteMovieByUuid() method.
+        $this->ar->addAggregateRoot($movie);
     }
 }

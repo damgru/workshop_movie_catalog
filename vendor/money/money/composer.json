@@ -1,0 +1,53 @@
+{
+    "name": "money/money",
+    "description": "PHP implementation of Fowler's Money pattern",
+    "type": "library",
+    "keywords": [ "Money", "Value Object", "Generic Sub-domain", "domain-driven design", "DDD" ],
+    "homepage": "http://verraes.net/2011/04/fowler-money-pattern-in-php/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathias Verraes",
+            "email": "mathias@verraes.net",
+            "homepage": "http://verraes.net"
+        },
+        {
+            "name": "Gustavo Santos",
+            "email": "gustavo.santos@hgestao.com.br"
+        },
+        {
+            "name": "Aken Roberts",
+            "email": "aken@swarmingtech.com"
+        },
+        {
+            "name": "Hassan Amouhzi",
+            "email": "hassan@amouhzi.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
+    },
+    "autoload": {
+        "psr-0": {
+            "Money": "src"
+        }
+    },
+
+    "config": {
+        "bin-dir": "bin"
+    },
+    "suggest": {
+        "TheBigBrainsCompany/TbbcMoneyBundle": "Very complete Symfony2 bundle with support for Twig, Doctrine, Forms, ...", 
+        "pink-tie/money-bundle": "Pink-Tie's Symfony2 integration with Money library",
+        "Sylius/SyliusMoneyBundle": "Sylius' Symfony2 integration with Money library"
+    },
+    "minimum-stability": "dev"
+}

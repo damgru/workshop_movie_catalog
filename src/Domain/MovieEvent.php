@@ -15,10 +15,10 @@ use Rhumsaa\Uuid\Uuid;
 class MovieEvent extends AggregateChanged
 {
     /** @var string */
-    private $date;
-    private $version = '1';
-    private $eventId;
-    private $data;
+    protected $date;
+    protected $version = '1';
+    protected $eventId;
+    protected $data;
 
     /**
      * @return string

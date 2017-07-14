@@ -10,6 +10,9 @@ namespace Infrastructure;
 
 
 use Doctrine\DBAL\Connection;
+use Domain\Event\MovieAdded;
+use Domain\Event\MovieDeleted;
+use Domain\MovieEvent;
 use PDO;
 
 class ReadonlyMovies
@@ -35,6 +38,27 @@ SELECT * FROM movie_catalog.readonly_movies;
 SQL;
 
         return $this->connection->fetchAll($sql);
+    }
+
+    public function whenMovieAdded(MovieAdded $e)
+    {
+        $this->connection->executeQuery(
+            'INSERT 
+                INTO movie_catalog.readonly_movies (uuid, name, img, url, createdAt) 
+                VALUES (?,?,?,?,?)',
+            [
+                (string)$e->getUuid(), $e->getName(), $e->getImg(), $e->getUrl(), $e->getDate()
+            ]);
+    }
+
+    public function whenMovieDeleted(MovieDeleted $e)
+    {
+        $this->connection->executeQuery(
+            'DELETE FROM movie_catalog.readonly_movies 
+                WHERE uuid = ?',
+            [
+                (string)$e->getUuid()
+            ]);
     }
 
 }

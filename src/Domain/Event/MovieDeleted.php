@@ -13,6 +13,8 @@ use Prooph\EventSourcing\AggregateChanged;
 
 class MovieDeleted extends AggregateChanged
 {
+    const NAME = 'MOVIE_DELETED';
+
     public static function from($uuid, $name)
     {
         return self::occur(

@@ -14,7 +14,6 @@ use Rhumsaa\Uuid\Uuid;
 
 interface MoviesRepository
 {
-    public function GetMovie(Uuid $uuid);
-    public function AddMovie(Movie $movie);
-    public function DeleteMovieByUuid(Uuid $uuid);
+    public function getMovie(Uuid $uuid);
+    public function saveMovie(Movie $movie);
 }
