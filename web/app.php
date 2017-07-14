@@ -209,7 +209,10 @@ $app->get('/movies/', function (Application $app){
     foreach ($movies as &$movie)
     {
         unset($movie['id']);
-        $movie['url'] = '';
+        unset($movie['url']);
+        unset($movie['link']);
+        $movie['amount'] = '5.00';
+        $movie['currency'] = 'PLN';
     }
     return new Response(json_encode($movies));
 });

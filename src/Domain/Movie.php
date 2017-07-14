@@ -26,6 +26,25 @@ class Movie extends AggregateRoot implements \JsonSerializable
     /** @var  string */
     private $link;
 
+    private $amount = 5.00;
+
+    /**
+     * @return float
+     */
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+    private $currency = 'PLN';
+
     /**
      * @param $uuid
      * @param $name
@@ -86,7 +105,9 @@ class Movie extends AggregateRoot implements \JsonSerializable
         return [
             'id' => $this->getUuid()->toString(),
             'name' => $this->getName(),
-            'img' => $this->getImg()
+            'img' => $this->getImg(),
+            'amount' => $this->getAmount(),
+            'currency' => $this->getCurrency()
         ];
     }
 
